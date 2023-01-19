@@ -4,7 +4,7 @@ import { z } from 'zod'
 import dayjs from 'dayjs'
 
 export async function appRoutes(app: FastifyInstance) {
-    app.post('/habit', async (req, res) => {
+    app.post('/habit', async (req) => {
         const createHabitBody = z.object({
             title: z.string(),
             weekDays: z.array(
@@ -28,7 +28,7 @@ export async function appRoutes(app: FastifyInstance) {
         })
     })
 
-    app.get('/day', async(req, res) => {
+    app.get('/day', async(req) => {
         const getDayParams = z.object({
             date: z.coerce.date()
         })
@@ -68,11 +68,69 @@ export async function appRoutes(app: FastifyInstance) {
         }
     })
 
-    app.put('/toggleDayHabit', async(req, res) => {
+    app.patch('/habits/:id/toggle', async(req) => {
+        const toggleHabitParams = z.object({
+            id: z.string().uuid()
+        })
+
+        const {id} = toggleHabitParams.parse(req.params)
+
+        const today = dayjs().startOf('day').toDate()
+
+        let day = await prisma.day.findUnique({
+            where: {
+                date: today
+            }
+        })
+
+        if(!day) {            day = await prisma.day.create({
+                data: {
+                    date: today
+                }
+            })
+        }
+
+        const dayHabit = await prisma.dayHabit.findUnique({
+            where: {
+                day_id_habit_id: {
+                    day_id: day.id, 
+                    habit_id: id
+                }
+            }
+        })
+
+        if(dayHabit) {
+            await prisma.dayHabit.delete({
+                where : {
+                    id: dayHabit.id
+                }
+            })
+        } else {
+            await prisma.dayHabit.create({
+                data: {
+                    day_id: day.id,
+                    habit_id: id
+                }
+            })
+        }
         
     })
 
-    app.patch('/resume', async(req, res) => {
+    app.get('/summary', async(req) => {
         
+        const summary = prisma.$queryRaw`
+            SELECT
+                d.id,
+                d.date,
+                CAST(COUNT(dh.id) AS float) completed,
+                CAST(COUNT(h.id) AS float) amount
+            FROM days d
+            LEFT JOIN day_habit dh ON dh.day_id = d.id
+            LEFT JOIN habit_week_days hwd ON hwd.week_day = CAST(strftime('%w', d.date /1000.0, 'unixepoch') AS int )
+            INNER JOIN habits h ON h.id = hwd.habit_id AND h.created_at >= d.date
+            GROUP BY d.id
+        `
+
+        return summary
     })
 }
