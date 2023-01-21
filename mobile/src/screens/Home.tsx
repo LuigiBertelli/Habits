@@ -5,7 +5,7 @@ import { generateDatesFromYearBeginning } from '../utils/dates-from-year-beginni
 import { DAY_SIZE, HabitDay } from '../components/HabitDay'
 import { Header } from '../components/Header'
 
-const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']
+const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
 const daysFromYearStart = generateDatesFromYearBeginning()
 const minimunSummaryDatesSize = 5 * 7 // 5 weeks
@@ -35,7 +35,7 @@ export const Home = () => {
                 showsVerticalScrollIndicator={false}>
                 <View className="flex-row flex-wrap">
                     {
-                        daysFromYearStart.map(date => <HabitDay key={date.toISOString()} />)
+                        daysFromYearStart.map(date => <HabitDay key={date.toISOString()} date={date.toISOString()}/>)
                     }
 
                     {

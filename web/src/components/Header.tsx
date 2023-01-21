@@ -25,7 +25,7 @@ export const Header = () => {
                 <X size={24} aria-label="close"/> 
               </Dialog.Close>
               <Dialog.Title className="text-3xl leading-3 font-bold">
-                Create habit
+                New habit
               </Dialog.Title>
               <NewHabitForm />
             </Dialog.Content>
