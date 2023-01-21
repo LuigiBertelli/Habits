@@ -1,19 +1,54 @@
-import { View, Text, ScrollView } from 'react-native'
+import { View, Text, ScrollView, Alert } from 'react-native'
+import { useState, useEffect } from 'react'
+import dayjs from 'dayjs'
 
 import { generateDatesFromYearBeginning } from '../utils/dates-from-year-beginning'
+import { api } from '../lib/axios'
 
 import { DAY_SIZE, HabitDay } from '../components/HabitDay'
 import { Header } from '../components/Header'
+import { Loading } from '../components/Loading'
 
-const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+export declare type Summary = {
+    id: string;
+    date: string,
+    amount: number,
+    completed: number
+}[];
 
-const daysFromYearStart = generateDatesFromYearBeginning()
-const minimunSummaryDatesSize = 5 * 7 // 5 weeks
-const amountOfDaysToFill = minimunSummaryDatesSize - daysFromYearStart.length
+const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+const daysFromYearStart = generateDatesFromYearBeginning();
+const yearStartOffset = dayjs(daysFromYearStart[0]).get('day');
+const minimunSummaryDatesSize = (5 * 7) - yearStartOffset; // 5 weeks
+const amountOfDaysToFill = minimunSummaryDatesSize - daysFromYearStart.length;
 
 
 
 export const Home = () => {
+    const [loading, setLoading] = useState(true);
+    const [summary, setSummary] = useState<Summary>([]);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const res = await api.get('summary');
+            setSummary(res.data);
+        } catch(error) {
+            Alert.alert('Oops', 'We cannot find your habit summary, try again later!');
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchData();
+    },[])
+
+    if(loading)
+        return <Loading/>
+
     return (
         <View className="flex-1 bg-background px-8 pt-16">
             <Header/>
@@ -34,8 +69,34 @@ export const Home = () => {
                 contentContainerStyle={{paddingBottom: 100}}
                 showsVerticalScrollIndicator={false}>
                 <View className="flex-row flex-wrap">
+                    
                     {
-                        daysFromYearStart.map(date => <HabitDay key={date.toISOString()} date={date.toISOString()}/>)
+                        yearStartOffset > 0 && 
+                        Array
+                            .from({length: yearStartOffset})
+                            .map((_, idx) => (
+                                <View 
+                                    key={idx}
+                                    className="bg-zinc-900 rounded-lg border-2 m-1 border-zinc-800 opacity-40" 
+                                    style={{width: DAY_SIZE, height: DAY_SIZE}}/>)
+                            )
+                    }
+                    
+                    {
+                        daysFromYearStart.map(date => {
+                            const dayWithHabits = summary.find(day => {
+                                return dayjs(date).isSame(day.date, 'day');
+                            })
+
+                            return (
+                                <HabitDay 
+                                    key={date.toISOString()} 
+                                    date={date}
+                                    amount={dayWithHabits?.amount}
+                                    completed={dayWithHabits?.completed}
+                                    />
+                            )
+                        })
                     }
 
                     {
