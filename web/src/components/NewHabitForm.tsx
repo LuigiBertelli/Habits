@@ -38,6 +38,7 @@ export const NewHabitForm = () => {
         setTitle('');
         setWeekDays([]);
         alert('New habit created succesfully!');
+        location.reload();
     }
 
     return (
@@ -49,7 +50,7 @@ export const NewHabitForm = () => {
             <input 
                 type="text" 
                 id="title" 
-                className="p-4 rounded-lg mt-3 bg-zinc-800 text-white placeholder:text-zinc-400"
+                className="p-4 rounded-lg mt-3 bg-zinc-800 text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-600 focus:ring-offset-2 focus:ring-offset-zinc-900"
                 placeholder="i.e: Exercises, Sleep well, etc..." 
                 autoFocus
                 value={title}
@@ -71,7 +72,7 @@ export const NewHabitForm = () => {
 
             <button 
                 type="submit" 
-                className="mt-6 rounded-lg p-4 flex items-center  justify-center gap-3 font-semibold bg-green-600 hover:bg-green-500">
+                className="mt-6 rounded-lg p-4 flex items-center  justify-center gap-3 font-semibold transition-colors bg-green-600 hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 focus:ring-offset-zinc-900">
                 <Check size="20" weight="bold"/>
                 Save
             </button>

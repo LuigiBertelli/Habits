@@ -46,7 +46,7 @@ export const SummaryTable = () => {
                 }
 
                 {
-                    summaryDates.map(date => {
+                    summary.length > 0 && summaryDates.map(date => {
                         const dayInSummary = summary.find(day => {
                             return dayjs(date).isSame(day.date, 'day');
                         });
@@ -55,8 +55,8 @@ export const SummaryTable = () => {
                             <HabitDay 
                                 key={date.toString()} 
                                 date={date}
-                                amount={dayInSummary?.amount} 
-                                completed={dayInSummary?.completed}/>
+                                defaultAmount={dayInSummary?.amount} 
+                                defaultCompleted={dayInSummary?.completed}/>
                         );
                     })
                 }

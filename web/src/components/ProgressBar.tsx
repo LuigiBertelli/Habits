@@ -1,6 +1,9 @@
+import clsx from 'clsx'
+
 interface ProgressBar {
     progress: number
 }
+
 export const ProgressBar = (props: ProgressBar) => {
     return (
         <div className="h-3 rounded-xl bg-zinc-700 w-full mt-4">
@@ -8,7 +11,14 @@ export const ProgressBar = (props: ProgressBar) => {
               role="progressbar"
               aria-label="Completed habits progress"
               aria-valuenow={props.progress}
-              className="h-3 rounded-xl bg-violet-600"
+              className={clsx('h-3 max-w-full rounded-xl transition-all', {
+                'bg-violet-900': props.progress > 0  && props.progress < 20,
+                'bg-violet-800': props.progress >= 20 && props.progress < 40,
+                'bg-violet-700': props.progress >= 40 && props.progress < 60,
+                'bg-violet-600': props.progress >= 60 && props.progress < 80,
+                'bg-violet-500': props.progress >= 80,
+              })}
+              
               style={{
                 width: `${props.progress}%`
                 }}/>

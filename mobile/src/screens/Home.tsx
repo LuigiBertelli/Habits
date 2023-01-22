@@ -1,5 +1,6 @@
 import { View, Text, ScrollView, Alert } from 'react-native'
-import { useState, useEffect } from 'react'
+import { useState, useCallback } from 'react'
+import { useFocusEffect } from '@react-navigation/native'
 import dayjs from 'dayjs'
 
 import { generateDatesFromYearBeginning } from '../utils/dates-from-year-beginning'
@@ -28,6 +29,7 @@ const amountOfDaysToFill = minimunSummaryDatesSize - daysFromYearStart.length;
 export const Home = () => {
     const [loading, setLoading] = useState(true);
     const [summary, setSummary] = useState<Summary>([]);
+    
 
     const fetchData = async () => {
         try {
@@ -42,9 +44,9 @@ export const Home = () => {
         }
     }
 
-    useEffect(() => {
+    useFocusEffect(useCallback(() => {
         fetchData();
-    },[])
+    }, []))
 
     if(loading)
         return <Loading/>

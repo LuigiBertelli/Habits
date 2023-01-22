@@ -60,7 +60,7 @@ export async function appRoutes(app: FastifyInstance) {
             }
         })
 
-        const completedHabits = day?.dayHabits.map(dayHabit => dayHabit.habit_id)
+        const completedHabits = day?.dayHabits.map(dayHabit => dayHabit.habit_id) ?? []
 
         return {
             possibleHabits,
@@ -125,9 +125,9 @@ export async function appRoutes(app: FastifyInstance) {
                 CAST(COUNT(dh.id) AS float) completed,
                 CAST(COUNT(h.id) AS float) amount
             FROM days d
-            LEFT JOIN day_habit dh ON dh.day_id = d.id
-            LEFT JOIN habit_week_days hwd ON hwd.week_day = CAST(strftime('%w', d.date /1000.0, 'unixepoch') AS int )
-            INNER JOIN habits h ON h.id = hwd.habit_id AND h.created_at >= d.date
+                LEFT JOIN day_habit dh ON dh.day_id = d.id
+                LEFT JOIN habit_week_days hwd ON hwd.week_day = CAST(strftime('%w', d.date /1000.0, 'unixepoch') AS int )
+                INNER JOIN habits h ON h.id = hwd.habit_id AND h.created_at <= d.date
             GROUP BY d.id
         `
 
