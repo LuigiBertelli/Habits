@@ -10,21 +10,39 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Users {
+  id         String   @id @default(uuid())
+  name       String
+  email      String
+  password   String
+  created_at DateTime
+  habits     Habit[]
+  days       Day[]
+
+  @@unique([email])
+  @@map("users")
+}
+
 model Habit {
-  id         String          @id @default(uuid())
+  id         String   @id @default(uuid())
   title      String
   created_at DateTime
-  dayHabits  DayHabit[]
-  weekDays   HabitWeekDays[]
+  user_id    String
+
+  dayHabits DayHabit[]
+  weekDays  HabitWeekDays[]
+  Users     Users           @relation(fields: [user_id], references: [id])
 
   @@map("habits")
 }
 
 model Day {
-  id   String   @id @default(uuid())
-  date DateTime
+  id      String   @id @default(uuid())
+  date    DateTime
+  user_id String
 
   dayHabits DayHabit[]
+  Users     Users      @relation(fields: [user_id], references: [id])
 
   @@unique([date])
   @@map("days")
