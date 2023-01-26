@@ -5,17 +5,23 @@ import bcrypt from 'bcrypt'
 import dayjs from 'dayjs'
 
 import { generatePasswordAlias } from './utils/generate-passwords-alias'
+import { coalesce } from './utils/dbUtils'
 
 export async function appRoutes(app: FastifyInstance) {
-    app.post('/habit', async (req) => {
+    app.post('/:userId/habit', async (req) => {
         const createHabitBody = z.object({
-            userId: z.string().uuid(),
             title: z.string(),
             weekDays: z.array(
                 z.number().min(0).max(6))
         })
 
-        const { userId, title, weekDays} = createHabitBody.parse(req.body)
+        const createHabitParams = z.object({
+            userId: z.string().uuid(),
+        })
+
+        const { userId } = createHabitParams.parse(req.params)
+
+        const { title, weekDays} = createHabitBody.parse(req.body)
 
         const today = dayjs().startOf('day').toDate()
 
@@ -33,13 +39,17 @@ export async function appRoutes(app: FastifyInstance) {
         })
     })
 
-    app.get('/day', async(req) => {
+    app.get('/:userId/day', async(req) => {
         const getDayParams = z.object({
             userId: z.string().uuid(),
+        })
+
+        const getDayQueryParams = z.object({
             date: z.coerce.date()
         })
 
-        const { userId, date } = getDayParams.parse(req.query)
+        const { userId } = getDayParams.parse(req.params)
+        const { date } = getDayQueryParams.parse(req.query)
 
         const parsedDate = dayjs(date).startOf('day').toDate()
         const weekDay = dayjs(parsedDate).get('day')
@@ -60,7 +70,10 @@ export async function appRoutes(app: FastifyInstance) {
 
         const day = await prisma.day.findUnique({
             where: {
-                date: parsedDate
+                date_user_id: {
+                    date: parsedDate,
+                    user_id: userId
+                }
             },
             include: {
                 dayHabits: true
@@ -75,25 +88,30 @@ export async function appRoutes(app: FastifyInstance) {
         }
     })
 
-    app.patch('/habits/:id/toggle', async(req) => {
+    app.patch('/:userId/habits/:id/toggle', async(req) => {
         const toggleHabitParams = z.object({
-            id: z.string().uuid()
+            id: z.string().uuid(),
+            userId: z.string().uuid(),
         })
 
-        const {id} = toggleHabitParams.parse(req.params)
+        const { id, userId } = toggleHabitParams.parse(req.params)
 
         const today = dayjs().startOf('day').toDate()
 
         let day = await prisma.day.findUnique({
             where: {
-                date: today
+                date_user_id: {
+                    user_id: userId,
+                    date: today
+                }
             }
         })
 
         if(!day) {            
             day = await prisma.day.create({
                 data: {
-                    date: today
+                    date: today,
+                    user_id: userId
                 }
             })
         }
@@ -124,13 +142,13 @@ export async function appRoutes(app: FastifyInstance) {
         
     })
 
-    app.get('/summary', async(req) => {
+    app.get('/:userId/summary', async(req) => {
 
         const summaryParams = z.object({
             userId: z.string().uuid()
         })
 
-        const { userId } = summaryParams.parse(req)
+        const { userId } = summaryParams.parse(req.params)
         
         const summary = prisma.$queryRaw`
             SELECT
@@ -143,7 +161,7 @@ export async function appRoutes(app: FastifyInstance) {
                 LEFT JOIN habit_week_days hwd ON hwd.week_day = CAST(strftime('%w', d.date /1000.0, 'unixepoch') AS int )
                 INNER JOIN habits h ON h.id = hwd.habit_id AND h.created_at <= d.date
             WHERE
-                d.user_id = '${userId}'
+                d.user_id = ${userId}
             GROUP BY d.id
         `
 
@@ -162,13 +180,6 @@ export async function appRoutes(app: FastifyInstance) {
 
         const cryptedPswd = await bcrypt.hash(generatePasswordAlias(email, created_at.toString(), password), await bcrypt.genSalt(8));
 
-        console.log({
-            name,
-            password: cryptedPswd,
-            email,
-            created_at
-        });
-
         await prisma.users.create({
             data: {
                 name,
@@ -185,7 +196,8 @@ export async function appRoutes(app: FastifyInstance) {
             password: z.string()
         })
 
-        const { email, password } = loginParams.parse(req.query)  
+        const { email, password } = loginParams.parse(req.query)
+        
         const user = await prisma.users.findUnique({
             where: {
                 email
@@ -200,9 +212,11 @@ export async function appRoutes(app: FastifyInstance) {
         if(user) {
             const pswdIsEqual = await bcrypt.compare(generatePasswordAlias(email, user.created_at.toString(), password), user.password);
 
-            console.log(user.password)
             if(pswdIsEqual)
-                return { user_id: user.id }
-        }
+                return { userId: user.id }
+            else
+                return { error: 'Wrong password, keep trying (if it really is your account)'}
+        } else
+            return { error: 'We can\'t find any user with this email'}
     })
 }

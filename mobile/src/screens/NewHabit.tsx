@@ -9,9 +9,13 @@ import { Feather } from '@expo/vector-icons'
 import colors from 'tailwindcss/colors'
 import { api } from '../lib/axios'
 
+interface NewHabitProps {
+    userId: string
+}
+
 const avaiableWeekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export const NewHabit = () => {
+export const NewHabit = ({ userId }: NewHabitProps) => {
     const [weekDays, setWeekDays] = useState<number[]>([]);
     const [title, setTitle] = useState('');
 
@@ -27,7 +31,7 @@ export const NewHabit = () => {
             if(!title.trim()  || weekDays.length === 0)
                 return Alert.alert('New habit', 'Please, type the title and chose the days.');
 
-            await api.post('habit', {
+            await api.post(`${userId}/habit`, {
                 title: title.trim(),
                 weekDays
             });

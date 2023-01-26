@@ -1,44 +1,47 @@
 import { getAuth, signInWithPopup, FacebookAuthProvider } from 'firebase/auth'
-import { FacebookLogo } from 'phosphor-react'
+import facebookLogoSVG from '../assets/FacebookLogo.svg'
 
-export const FabebookLoginButton = () => {
-    const provider = new FacebookAuthProvider();
-    provider.setCustomParameters({
-        'display': 'popup'
-    });
+export const FacebookLoginButton = () => {
+    // const provider = new FacebookAuthProvider();
+    // provider.setCustomParameters({
+    //     'display': 'popup'
+    // });
 
-    const auth = getAuth();
+    // const auth = getAuth();
     
-    const handleFacebookLogin = () => {
-        signInWithPopup(auth, provider)
-            .then((result) => {
-                // The signed-in user info.
-                const user = result.user;
+    // const handleFacebookLogin = () => {
+    //     signInWithPopup(auth, provider)
+    //         .then((result) => {
+    //             // The signed-in user info.
+    //             const user = result.user;
 
-                // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-                const credential = FacebookAuthProvider.credentialFromResult(result);
-                const accessToken = credential?.accessToken;
+    //             // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+    //             const credential = FacebookAuthProvider.credentialFromResult(result);
+    //             const accessToken = credential?.accessToken;
 
-                // ...
-            })
-            .catch((error) => {
-                // Handle Errors here.
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                // The email of the user's account used.
-                const email = error.customData.email;
-                // The AuthCredential type that was used.
-                const credential = FacebookAuthProvider.credentialFromError(error);
+    //             // ...
+    //         })
+    //         .catch((error) => {
+    //             // Handle Errors here.
+    //             const errorCode = error.code;
+    //             const errorMessage = error.message;
+    //             // The email of the user's account used.
+    //             const email = error.customData.email;
+    //             // The AuthCredential type that was used.
+    //             const credential = FacebookAuthProvider.credentialFromError(error);
 
-                // ...
-            });
-    }
+    //             // ...
+    //         });
+    // }
 
     return (
-        <button className='w-full h-12 text-white font-semibold text-base leading-tight bg-violet-800'
-            onClick={handleFacebookLogin}>
-                <FacebookLogo
-                    size={20}/>
+        <button 
+            className="w-full h-12 my-3 px-4 items-center rounded-md bg-facebook font-semibold text-base leading-tight flex gap-3"
+            >
+                <img src={facebookLogoSVG} alt="Facebook logo"/>
+                <span>
+                    Continue with Facebook
+                </span>
         </button>
     );
 }

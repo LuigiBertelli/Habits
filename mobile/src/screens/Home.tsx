@@ -29,12 +29,12 @@ const amountOfDaysToFill = minimunSummaryDatesSize - daysFromYearStart.length;
 export const Home = () => {
     const [loading, setLoading] = useState(true);
     const [summary, setSummary] = useState<Summary>([]);
-    
+    const [userId, setUserId] = useState('');
 
     const fetchData = async () => {
         try {
             setLoading(true);
-            const res = await api.get('summary');
+            const res = await api.get(`${userId}/summary`);
             setSummary(res.data);
         } catch(error) {
             Alert.alert('Oops', 'We cannot find your habit summary, try again later!');

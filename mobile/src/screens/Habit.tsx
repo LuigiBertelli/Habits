@@ -12,6 +12,9 @@ import { Loading } from '../components/Loading'
 import { generateProgressPercentage } from '../utils/generate-progres-percentage'
 import { HabitsEmpty } from '../components/HabitsEmpty'
 
+interface HabitProps {
+    userId: string
+}
 
 interface HabitParams {
     date: string
@@ -26,7 +29,7 @@ interface DayInfoProps {
     }[]
 }
 
-export const Habit = () => {
+export const Habit = ({ userId }: HabitProps) => {
 
     const [loading, setLoading] = useState(true);
     const [dayInfo, setDayInfo] = useState<DayInfoProps>();
@@ -44,7 +47,7 @@ export const Habit = () => {
     const fetchHabits = async() => {
         try {
             setLoading(true);
-            const res = await api.get('day', {
+            const res = await api.get(`${userId}/day`, {
                 params: {
                     date
                 }
@@ -66,7 +69,7 @@ export const Habit = () => {
                 dayInfo!.completedHabits.filter(habit => habit !== habitId) :
                 [...dayInfo!.completedHabits, habitId];
 
-            await api.patch(`habits/${habitId}/toggle`);
+            await api.patch(`${userId}/habits/${habitId}/toggle`);
             
             setDayInfo(prevState => ({
                 possibleHabits: prevState!.possibleHabits,

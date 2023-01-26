@@ -7,12 +7,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: "#09090A"
+        background: "#09090A",
+        facebook: "#1877F2"
       },
       gridTemplateRows: {
         7: 'repeat(7, minmax(0, 1fr))'
       }
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar'),
+  ],
 }

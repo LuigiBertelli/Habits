@@ -1,0 +1,1 @@
+export const coalesce = (str: string) => "'" + str + "'"

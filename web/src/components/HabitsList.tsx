@@ -6,6 +6,7 @@ import { api } from '../lib/axios'
 import { CheckboxSample } from './CheckBoxSample'
 
 interface HabitsListProps {
+  userId: string,
   date: Date,
   onCompletedChange: (amount: number, completed: number) => void
 }
@@ -19,13 +20,13 @@ interface HabitsInfo{
   completedHabits: string[]
 };
 
-export const HabitsList = ({date, onCompletedChange}: HabitsListProps) => {
+export const HabitsList = ({userId, date, onCompletedChange}: HabitsListProps) => {
     const [dayHabitsInfo, setDayHabitsInfo] = useState<HabitsInfo>();
 
     const isDateInPast = dayjs(date).endOf('day').isBefore(new Date());
 
     useEffect(() => {
-      api.get('day', {
+      api.get(`${userId}/day`, {
         params: {
           date: date.toISOString()
         }
@@ -41,7 +42,9 @@ export const HabitsList = ({date, onCompletedChange}: HabitsListProps) => {
       const isHabitCompleted = dayHabitsInfo?.completedHabits.includes(habitId);
       let completedHabits: string[] = [];
 
-      await api.patch(`habits/${habitId}/toggle`)
+      await api.patch(`${userId}/habits/${habitId}/toggle`, {
+        userId
+      })
         .then(() => {
           if(isHabitCompleted)
             completedHabits = dayHabitsInfo!.completedHabits.filter(habit => habit !== habitId)

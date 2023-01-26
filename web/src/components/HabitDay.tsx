@@ -7,17 +7,18 @@ import { HabitsList } from './HabitsList'
 import { ProgressBar } from './ProgressBar'
 
 interface HabitProps {
+    userId: string,
     date: Date,
     defaultAmount?: number,
     defaultCompleted?: number
 
 }
 
-export const HabitDay = ({date, defaultAmount = 0, defaultCompleted = 0}: HabitProps) => {
+export const HabitDay = ({userId, date, defaultAmount = 0, defaultCompleted = 0}: HabitProps) => {
   const [completed, setCompleted] = useState(defaultCompleted);
   const [amount, setAmount] = useState(defaultAmount);
 
-  const completedPerc = amount > 0 ?  Math.round((completed / amount) * 100) : 0;  
+  const completedPerc = amount > 0 ?  Math.round((completed / amount) * 100) : 0;
   
   const parsedDate = dayjs(date);
   const dayAndMonth = parsedDate.format('DD/MM');
@@ -47,8 +48,10 @@ export const HabitDay = ({date, defaultAmount = 0, defaultCompleted = 0}: HabitP
           <ProgressBar progress={completedPerc} />
 
           <HabitsList 
+            userId={userId}
             date={date} 
-            onCompletedChange={hadleCompletedChange}/>
+            onCompletedChange={hadleCompletedChange}
+            />
 
           <Popover.Arrow className="fill-zinc-900" height={8} width={16} />
         </Popover.Content>

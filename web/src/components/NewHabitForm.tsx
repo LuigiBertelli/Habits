@@ -5,9 +5,13 @@ import { FormEvent, useState } from 'react'
 import { api } from '../lib/axios'
 import { CheckboxSample } from './CheckBoxSample'
 
+interface NewHabitFormProps {
+    userId: string
+}
+
 const avaiableWeekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export const NewHabitForm = () => {
+export const NewHabitForm = ({ userId } : NewHabitFormProps) => {
     const [title, setTitle] = useState('');
     const [weekDays, setWeekDays] = useState<number[]>([]);
 
@@ -25,20 +29,20 @@ export const NewHabitForm = () => {
             return;
 
         await api
-            .post('habit', {
+            .post(`${userId}/habit`, {
                 title: title.trim(),
                 weekDays
+            })
+            .then(() => {
+                setTitle('');
+                setWeekDays([]);
+                alert('New habit created succesfully!');
+                location.reload();
             })
             .catch(ex => {
                 alert('Error creating new habit, try again later.');
                 console.log(ex);
             });
-
-            
-        setTitle('');
-        setWeekDays([]);
-        alert('New habit created succesfully!');
-        location.reload();
     }
 
     return (
