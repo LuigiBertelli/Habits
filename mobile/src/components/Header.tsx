@@ -6,26 +6,34 @@ import colors from 'tailwindcss/colors'
 
 import LogoSVG from '../assets/logo.svg'
 
-export const Header = () => {
+interface HeaderProps {
+    userId?: string
+}
+
+export const Header = ({ userId } : HeaderProps) => {
     const { navigate } = useNavigation();
     return (
         <View className="w-full flex-row items-center justify-between">
             <LogoSVG />
 
-            <TouchableOpacity 
-                className="flex-row h-11 px-4 border border-violet-500 rounded-lg items-center"
-                activeOpacity={0.7}
-                onPress={() => navigate('new-habit')}>
-                <Feather
-                    name="plus"
-                    color={colors.violet[500]}
-                    size={20}
-                />
+            {
+                userId && (
+                    <TouchableOpacity 
+                        className="flex-row h-11 px-4 border border-violet-500 rounded-lg items-center"
+                        activeOpacity={0.7}
+                        onPress={() => navigate('new-habit', {userId})}>
+                        <Feather
+                            name="plus"
+                            color={colors.violet[500]}
+                            size={20}
+                        />
 
-                <Text className="text-white ml-3 font-semibold text-base">
-                    New
-                </Text>
-            </TouchableOpacity>
+                        <Text className="text-white ml-3 font-semibold text-base">
+                            New
+                        </Text>
+                    </TouchableOpacity>
+                )
+            }
         </View>
     )
 }

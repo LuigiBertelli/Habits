@@ -5,7 +5,7 @@ import {BrowserRouter , Routes, Route} from 'react-router-dom'
 import { App } from './App'
 import { Home } from './pages/Home'
 import { Login } from './pages/Login'
-import { Signin } from './pages/Signin'
+import { Signup } from './pages/Signup'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
@@ -14,7 +14,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <Route path="/" element={<App />}>
           <Route index element={<Home/>}/>
           <Route path="login" element={<Login/>}/>
-          <Route path="signin" element={<Signin/>}/>
+          <Route path="signup" element={<Signup/>}/>
         </Route>
       </Routes>
     </BrowserRouter>

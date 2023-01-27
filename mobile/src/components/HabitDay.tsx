@@ -6,6 +6,7 @@ import dayjs from 'dayjs'
 import { generateProgressPercentage } from '../utils/generate-progres-percentage';
 
 interface HabitDayProps {
+    userId: string,
     date: Date,
     amount?: number,
     completed?: number,
@@ -17,7 +18,7 @@ const SCREEN_Y_PADDING = (32 * 2) / 5;
 export const DAY_MARGIN_BETWEEN = 8;
 export const DAY_SIZE = (Dimensions.get('screen').width / WEEK_DAYS) - (SCREEN_Y_PADDING + 5)
 
-export const HabitDay = ({amount = 0, completed = 0, date}: HabitDayProps) => {
+export const HabitDay = ({userId, amount = 0, completed = 0, date}: HabitDayProps) => {
     const { navigate } = useNavigation();
 
     const progressPerc = generateProgressPercentage(amount, completed);
@@ -39,6 +40,6 @@ export const HabitDay = ({amount = 0, completed = 0, date}: HabitDayProps) => {
                     'border-white border-4': isCurrentDay
                 })} 
             style={{width: DAY_SIZE, height: DAY_SIZE}}
-            onPress={() => navigate('habit', {date: date.toISOString()})} />
+            onPress={() => navigate('habit', {userId, date: date.toISOString()})} />
     )
 }

@@ -1,4 +1,4 @@
-import { StatusBar} from 'react-native';
+import { StatusBar} from 'react-native'
 import { 
   useFonts,
   Inter_400Regular,
@@ -6,10 +6,13 @@ import {
   Inter_700Bold,
   Inter_800ExtraBold} from '@expo-google-fonts/inter'
 
-import { Loading } from './src/components/Loading';
+import { Loading } from './src/components/Loading'
 
 import './src/lib/dayjs'
-import { Routes } from './src/routes';
+import 'expo-dev-client'
+
+import { Routes } from './src/routes'
+
 
 export default function App() {
   const [fontsLoaded] = useFonts({

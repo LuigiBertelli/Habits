@@ -1,6 +1,6 @@
 import { View, ScrollView, Text, TextInput, TouchableOpacity, Alert } from 'react-native'
 import { useState } from 'react'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 
 import { BackButton } from '../components/BackButton'
 import { CheckBox } from '../components/CheckBox'
@@ -9,16 +9,17 @@ import { Feather } from '@expo/vector-icons'
 import colors from 'tailwindcss/colors'
 import { api } from '../lib/axios'
 
-interface NewHabitProps {
+interface NewHabitParams {
     userId: string
 }
 
 const avaiableWeekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export const NewHabit = ({ userId }: NewHabitProps) => {
+export const NewHabit = () => {
     const [weekDays, setWeekDays] = useState<number[]>([]);
     const [title, setTitle] = useState('');
-
+    const route = useRoute();
+    const { userId } = route.params as NewHabitParams;
     const { goBack } = useNavigation();
 
     const handleToggleWeekDay = (weekDay: number) => (

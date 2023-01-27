@@ -1,13 +1,14 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
-import { appRoutes } from './routes'
+import { appHabitsRoutes } from './routes/habits'
+import { appUsersRoutes } from './routes/users'
 
 const app = Fastify()
 
 
 app.register(cors)
-app.register(appRoutes)
-
+app.register(appHabitsRoutes)
+app.register(appUsersRoutes)
 
 app.listen({
     port: 3333,

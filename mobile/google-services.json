@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "446522927986",
+    "project_id": "habits-79976",
+    "storage_bucket": "habits-79976.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:446522927986:android:d45857caa8338083244beb",
+        "android_client_info": {
+          "package_name": "com.berteluigi.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "446522927986-q5br23bbj8sr0h4e9qgqktc096lilc3u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.berteluigi.mobile",
+            "certificate_hash": "b3caff623fefd7958da57bdbda15f2da1f62bf8e"
+          }
+        },
+        {
+          "client_id": "446522927986-9fmqt1esikkfm3qugfn3cpikr02qt4h7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhPF8GsAUfrznCTMCX1Nyz_BqJ6q_1LUo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "446522927986-9fmqt1esikkfm3qugfn3cpikr02qt4h7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { EyeClosed, Eye } from 'phosphor-react'
+import { initializeApp } from "firebase/app";
 
 import { api } from '../lib/axios'
 import { setCookie } from '../utils/cookies'
@@ -12,7 +13,16 @@ import { FacebookLoginButton} from './FacebookLoginButton'
 import logoImg from '../assets/logo.svg'
 import colors from 'tailwindcss/colors'
 
+import authJson from '../configs/firebaseAuth.json'
+import { getAuth } from 'firebase/auth'
+
+const firebaseConfig = authJson.auth;
+
 export const LoginForm = () => {
+  // Initialize Firebase
+  const firebaseApp = initializeApp(firebaseConfig);
+  const firebaseAuth = getAuth(firebaseApp);
+
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,7 +44,7 @@ export const LoginForm = () => {
         if(error)
             alert(error);
         else if(userId){
-            setCookie('userId', userId, 300);
+            setCookie('userId', userId, 3);
             setEmail('');
             setPassword('');
             navigate('/');
@@ -100,8 +110,19 @@ export const LoginForm = () => {
 
         
 
-        <GoogleLoginButton />
-        <FacebookLoginButton />
+        <GoogleLoginButton firebaseAuth={firebaseAuth} />
+        <FacebookLoginButton firebaseAuth={firebaseAuth} />
+
+        <div className="mt-6 text-zinc-400 text-base">
+            Don't you have an account? {' '}
+            <Link to='/signup'>
+                <span
+                    className="text-violet-400 text-base underline active:text-violet-500"
+                    >
+                    Sign up
+                </span>
+            </Link>
+        </div>
     </form>
   )
 }

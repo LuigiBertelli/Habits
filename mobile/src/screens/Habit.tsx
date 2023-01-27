@@ -12,11 +12,8 @@ import { Loading } from '../components/Loading'
 import { generateProgressPercentage } from '../utils/generate-progres-percentage'
 import { HabitsEmpty } from '../components/HabitsEmpty'
 
-interface HabitProps {
-    userId: string
-}
-
 interface HabitParams {
+    userId: string,
     date: string
 }
 
@@ -29,13 +26,13 @@ interface DayInfoProps {
     }[]
 }
 
-export const Habit = ({ userId }: HabitProps) => {
+export const Habit = () => {
 
     const [loading, setLoading] = useState(true);
     const [dayInfo, setDayInfo] = useState<DayInfoProps>();
 
     const route = useRoute();
-    const { date } = route.params as HabitParams;
+    const { userId, date } = route.params as HabitParams;
 
     const parsedDate = dayjs(date);
     const isDateInPast = parsedDate.endOf('day').isBefore(new Date());
@@ -115,7 +112,7 @@ export const Habit = ({ userId }: HabitProps) => {
                                     disabled={isDateInPast}/>
                             ))
                         :
-                            <HabitsEmpty/>
+                            <HabitsEmpty userId={userId}/>
                     }
                 </View>
 

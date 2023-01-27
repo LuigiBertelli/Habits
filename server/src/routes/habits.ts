@@ -1,13 +1,9 @@
-import { prisma } from './lib/prisma'
+import { prisma } from '../lib/prisma'
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import bcrypt from 'bcrypt'
 import dayjs from 'dayjs'
 
-import { generatePasswordAlias } from './utils/generate-passwords-alias'
-import { coalesce } from './utils/dbUtils'
-
-export async function appRoutes(app: FastifyInstance) {
+export async function appHabitsRoutes(app: FastifyInstance) {
     app.post('/:userId/habit', async (req) => {
         const createHabitBody = z.object({
             title: z.string(),
@@ -151,72 +147,32 @@ export async function appRoutes(app: FastifyInstance) {
         const { userId } = summaryParams.parse(req.params)
         
         const summary = prisma.$queryRaw`
-            SELECT
-                d.id,
-                d.date,
-                CAST(COUNT(dh.id) AS float) completed,
-                CAST(COUNT(h.id) AS float) amount
-            FROM days d
-                LEFT JOIN day_habit dh ON dh.day_id = d.id
-                LEFT JOIN habit_week_days hwd ON hwd.week_day = CAST(strftime('%w', d.date /1000.0, 'unixepoch') AS int )
-                INNER JOIN habits h ON h.id = hwd.habit_id AND h.created_at <= d.date
-            WHERE
-                d.user_id = ${userId}
-            GROUP BY d.id
-        `
+            SELECT 
+                D.id, 
+                D.date,
+                (
+                    SELECT 
+                        cast(count(*) as float)
+                    FROM day_habit DH
+                    WHERE DH.day_id = D.id
+                ) as completed,
+                (
+                SELECT
+                    cast(count(*) as float)
+                FROM habit_week_days HDW
+                JOIN habits H
+                    ON H.id = HDW.habit_id
+                WHERE
+                    HDW.week_day = cast(strftime('%w', D.date/1000.0, 'unixepoch') as int)
+                    AND H.created_at <= D.date
+                    AND H.user_id = D.user_id
+                ) as amount
+            FROM days D
+            WHERE D.user_id = ${userId}
+            `
+
+
 
         return summary
-    })
-
-    app.post('/signin', async(req) => {
-        const signinParams = z.object({
-            email: z.string().email(),
-            password: z.string(),
-            name: z.string().trim()
-        })
-
-        const { email, password, name} = signinParams.parse(req.body)
-        const created_at = dayjs().toDate()
-
-        const cryptedPswd = await bcrypt.hash(generatePasswordAlias(email, created_at.toString(), password), await bcrypt.genSalt(8));
-
-        await prisma.users.create({
-            data: {
-                name,
-                password: cryptedPswd,
-                email,
-                created_at
-            }
-        })
-    })
-
-    app.get('/login', async(req) => {
-        const loginParams = z.object({
-            email: z.string().email(),
-            password: z.string()
-        })
-
-        const { email, password } = loginParams.parse(req.query)
-        
-        const user = await prisma.users.findUnique({
-            where: {
-                email
-            },
-            select: {
-                id: true,
-                created_at: true,
-                password: true
-            }
-        })
-
-        if(user) {
-            const pswdIsEqual = await bcrypt.compare(generatePasswordAlias(email, user.created_at.toString(), password), user.password);
-
-            if(pswdIsEqual)
-                return { userId: user.id }
-            else
-                return { error: 'Wrong password, keep trying (if it really is your account)'}
-        } else
-            return { error: 'We can\'t find any user with this email'}
     })
 }

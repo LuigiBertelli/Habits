@@ -19,7 +19,7 @@ type Summary = {
 const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const summaryDates = generateDatesFromYearBeginning();
 const yearStartOffset = dayjs(summaryDates[0]).get('day');
-const minSummaryDatesSize = (18 * 7) - yearStartOffset;// 18 weeks
+const minSummaryDatesSize = (14 * 7) - yearStartOffset;// 18 weeks
 const amountOfDaysToFill = minSummaryDatesSize - summaryDates.length;
 
 export const SummaryTable = ({ userId } : SummaryParams) => {

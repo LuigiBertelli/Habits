@@ -14,7 +14,7 @@ export const Home = () => {
     }, [])
 
     return (
-        <div className="w-full max-w-5xl px-6 flex flex-col gap-16">
+        <div className="w-full max-w-5xl px-5 flex flex-col gap-16">
             <Header userId={userId}/>
             {
                 userId ?
@@ -24,8 +24,8 @@ export const Home = () => {
                     <div className="text-center h-[17.5rem]">
                         <span>
                             Don't have an account yet? {' '}
-                            <Link className="text-violet-500" to='/signin'>
-                                Sign in with us.
+                            <Link className="text-violet-500" to='/signup'>
+                                Sign up with us.
                             </Link>
                         </span>
                     </div>

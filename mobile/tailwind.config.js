@@ -8,6 +8,7 @@ module.exports = {
     extend: {
       colors: {
         background: '#09090a',
+        facebook: "#1877F2"
       },
       fontFamily: {
         regular: 'Inter_400Regular',
