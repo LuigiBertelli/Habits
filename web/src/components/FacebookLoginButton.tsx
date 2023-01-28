@@ -1,11 +1,12 @@
-import { signInWithPopup, FacebookAuthProvider, Auth } from 'firebase/auth'
+import { signInWithPopup, FacebookAuthProvider, Auth, User } from 'firebase/auth'
 import facebookLogoSVG from '../assets/FacebookLogo.svg'
 
 interface FacebookLoginButtonProps {
-    firebaseAuth: Auth
+    firebaseAuth: Auth,
+    loginMethod: (user: User, social: string) => void
 }
 
-export const FacebookLoginButton = ({ firebaseAuth }: FacebookLoginButtonProps) => {
+export const FacebookLoginButton = ({ firebaseAuth, loginMethod }: FacebookLoginButtonProps) => {
     const provider = new FacebookAuthProvider();
     provider.setCustomParameters({
         'display': 'popup'

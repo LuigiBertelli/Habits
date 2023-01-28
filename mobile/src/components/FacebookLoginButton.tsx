@@ -5,7 +5,12 @@ import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
 
 import FacebookSVG from '../assets/FacebookLogo.svg'
 
-export const FacebookLoginButton = () => {
+interface FacebookLoginButtonProps {
+    loginMethod: (UserCredential: FirebaseAuthTypes.UserCredential, social: string) => void
+}
+
+
+export const FacebookLoginButton = ({ loginMethod } : FacebookLoginButtonProps) => {
     const [initializing, setInitializing] = useState(true);
     const [user, setUser] = useState<FirebaseAuthTypes.User | null>();
 
@@ -37,7 +42,9 @@ export const FacebookLoginButton = () => {
             const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
 
             // Sign-in the user with the credential
-            return auth().signInWithCredential(facebookCredential);
+            auth().signInWithCredential(facebookCredential)
+                .then(user => loginMethod(user, 'Facebook'))
+                .catch(err => console.log(err));
           } catch (err) {
             console.log(err);
           }

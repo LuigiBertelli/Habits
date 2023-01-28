@@ -1,12 +1,14 @@
-import { signInWithPopup, GoogleAuthProvider, Auth } from 'firebase/auth'
+import { signInWithPopup, GoogleAuthProvider, Auth, User } from 'firebase/auth'
 
 import googleLogoSVG from '../assets/GoogleLogo.svg'
+import { api } from '../lib/axios';
 
 interface GoogleLoginButtonProps {
-    firebaseAuth: Auth
+    firebaseAuth: Auth,
+    loginMethod: (user: User, social: string) => void
 }
 
-export const GoogleLoginButton = ({ firebaseAuth } : GoogleLoginButtonProps) => {
+export const GoogleLoginButton = ({ firebaseAuth, loginMethod } : GoogleLoginButtonProps) => {
     
     const provider = new GoogleAuthProvider();
     
@@ -18,8 +20,8 @@ export const GoogleLoginButton = ({ firebaseAuth } : GoogleLoginButtonProps) => 
                 const token = credential?.accessToken;
                 // The signed-in user info.
                 const user = result.user;
-                console.log(result.user);
-                // ...
+                
+                loginMethod(user, 'Google');
             }).catch((error) => {
                 // Handle Errors here.
                 console.log("zfdsfasd");

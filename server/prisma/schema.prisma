@@ -11,16 +11,29 @@ datasource db {
 }
 
 model Users {
-  id         String   @id @default(uuid())
-  name       String
-  email      String
-  password   String
-  created_at DateTime
-  habits     Habit[]
-  days       Day[]
+  id                     String          @id @default(uuid())
+  name                   String
+  email                  String
+  password               String?
+  recovery_password_hash String?
+  created_at             DateTime
+  habits                 Habit[]
+  days                   Day[]
+  ExternalUsers          ExternalUsers[]
 
   @@unique([email])
   @@map("users")
+}
+
+model ExternalUsers {
+  id      String
+  social  String
+  user_id String
+
+  Users Users @relation(fields: [user_id], references: [id])
+
+  @@id([id, social])
+  @@map("external_users")
 }
 
 model Habit {

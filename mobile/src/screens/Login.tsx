@@ -9,6 +9,7 @@ import LogoSVG from '../assets/logo.svg'
 import { api } from '../lib/axios'
 import { GoogleLoginButton } from '../components/GoogleLoginButton'
 import { FacebookLoginButton } from '../components/FacebookLoginButton'
+import { FirebaseAuthTypes } from '@react-native-firebase/auth'
 
 interface LoginParams {
     userId?: string
@@ -29,6 +30,39 @@ export const Login = () => {
             navigate('home', {userId: routeParams.userId});
     },[]))
 
+    const logIn = async (userId: string) => {
+        await AsyncStorage.setItem('userId', userId);
+                
+        setEmail('');
+        setPassword('');
+        setShowPassword(false);
+        navigate('home', {userId});
+    }
+    
+    const signInWithSocial = async(UserCredential: FirebaseAuthTypes.UserCredential, social: string) => {
+        const { uid, email, displayName} = UserCredential.user;
+    
+        try{
+            let res = await api.get(`login/${social}`, {
+                params: {
+                    id: uid
+                }
+            });
+        
+            if(!res.data.userId)
+                res =  await api.post(`signup/${social}`, {
+                   id: uid,
+                   email,
+                   name: displayName
+                });
+    
+            logIn(res.data.userId);
+        } catch(err) {
+            Alert.alert('Oops', `Sign in with ${social} failed`)
+            console.log(err);
+        }
+    }
+
     const handleSubmitLogin = async() => {
         try {
             const res = await api.get('login', {
@@ -43,13 +77,7 @@ export const Login = () => {
             if(error)
                 Alert.alert('Error', error);
             else if(userId) {
-                await AsyncStorage.setItem('userId', userId);
-                
-                setEmail('');
-                setPassword('');
-                setShowPassword(false);
-                navigate('home', {userId});
-                
+                logIn(userId);
             }
         } catch(err) {
             Alert.alert('Oops', 'Server response failed about your login, try again!');
@@ -100,8 +128,10 @@ export const Login = () => {
 
                     <View className="w-full h-0 border-b-2 border-b-zinc-500 my-12" />
 
-                    <GoogleLoginButton />
-                    <FacebookLoginButton />
+                    <GoogleLoginButton 
+                        loginMethod={signInWithSocial}/>
+                    <FacebookLoginButton 
+                        loginMethod={signInWithSocial}/>
 
                     <Text className="text-zinc-400 text-base">
                         Don't you have an account? {' '}

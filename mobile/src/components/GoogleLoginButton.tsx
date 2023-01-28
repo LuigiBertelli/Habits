@@ -6,11 +6,16 @@ import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth'
 import GoogleSVG from '../assets/GoogleLogo.svg'
 import authJson from '../configs/firebaseAuth.json'
 
+interface GoogleLoginButtonProps {
+    loginMethod: (UserCredential: FirebaseAuthTypes.UserCredential, social: string) => void
+}
+
 GoogleSignin.configure({
     webClientId: authJson.google.webClientId,
   });
 
-export const GoogleLoginButton = () => {
+
+export const GoogleLoginButton = ({ loginMethod } : GoogleLoginButtonProps) => {
     const [initializing, setInitializing] = useState(true);
     const [user, setUser] = useState<FirebaseAuthTypes.User | null>();
 
@@ -34,7 +39,7 @@ export const GoogleLoginButton = () => {
       
         // Sign-in the user with the credential
         auth().signInWithCredential(googleCredential)
-            .then(user => console.log(user))
+            .then(user => loginMethod(user, 'Google'))
             .catch(err => console.log(err));
       }
 

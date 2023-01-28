@@ -1,6 +1,5 @@
 import { FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { EyeClosed, Eye } from 'phosphor-react'
 import { initializeApp } from "firebase/app";
 
 import { api } from '../lib/axios'
@@ -11,10 +10,10 @@ import { FacebookLoginButton} from './FacebookLoginButton'
 
 
 import logoImg from '../assets/logo.svg'
-import colors from 'tailwindcss/colors'
 
 import authJson from '../configs/firebaseAuth.json'
-import { getAuth } from 'firebase/auth'
+import { getAuth, User } from 'firebase/auth'
+import { PasswordInput } from './PasswordInput';
 
 const firebaseConfig = authJson.auth;
 
@@ -23,10 +22,40 @@ export const LoginForm = () => {
   const firebaseApp = initializeApp(firebaseConfig);
   const firebaseAuth = getAuth(firebaseApp);
 
-  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+
+  const logIn = (userId: string) => {
+    setCookie('userId', userId, 3);
+    setEmail('');
+    setPassword('');
+    navigate('/');
+  }
+
+  const signInWithSocial = async(user: User, social: string) => {
+    const id = user.providerData[0]?.uid;
+
+    try{
+        let res = await api.get(`login/${social}`, {
+            params: {
+                id
+            }
+        });
+    
+        if(!res.data.userId)
+            res =  await api.post(`signup/${social}`, {
+               id,
+               email: user.email,
+               name: user.displayName
+            });
+
+        logIn(res.data.userId);
+    } catch(err) {
+        alert(`Sign in with ${social} failed`)
+        console.log(err);
+    }
+  }
 
   const handleSubmit = async(e: FormEvent) => {
     e.preventDefault();
@@ -44,10 +73,7 @@ export const LoginForm = () => {
         if(error)
             alert(error);
         else if(userId){
-            setCookie('userId', userId, 3);
-            setEmail('');
-            setPassword('');
-            navigate('/');
+            logIn(userId);
         }
         
     } catch(err) {
@@ -76,29 +102,9 @@ export const LoginForm = () => {
             onChange={e => setEmail(e.target.value)}
             value={email} />
 
-        <div className="flex items-center w-full px-2 bg-white mb-6">
-            <input
-                className="flex-1 text-zinc-800 py-2 focus:outline-none"
-                type={showPassword ? 'text' : 'password'} 
-                placeholder="Password"
-                onChange={e => setPassword(e.target.value)}
-                value={password} /> 
-                
-            {
-                showPassword ?
-                    <Eye
-                        className="cursor-pointer"
-                        size={16}
-                        color={colors.zinc[800]}
-                        onClick={e => setShowPassword(false)} />
-                :
-                    <EyeClosed
-                        className="cursor-pointer"
-                        size={16}
-                        color={colors.zinc[800]}
-                        onClick={e => setShowPassword(true)} />
-            }
-        </div>
+        <PasswordInput 
+            password={password}
+            setPassword={setPassword}/>
 
         <button 
             type="submit" 
@@ -110,8 +116,12 @@ export const LoginForm = () => {
 
         
 
-        <GoogleLoginButton firebaseAuth={firebaseAuth} />
-        <FacebookLoginButton firebaseAuth={firebaseAuth} />
+        <GoogleLoginButton 
+            firebaseAuth={firebaseAuth}
+            loginMethod={signInWithSocial} />
+        <FacebookLoginButton 
+            firebaseAuth={firebaseAuth}
+            loginMethod={signInWithSocial} />
 
         <div className="mt-6 text-zinc-400 text-base">
             Don't you have an account? {' '}
