@@ -26,7 +26,7 @@ export async function appHabitsRoutes(app: FastifyInstance) {
                 user_id: userId,
                 title,
                 created_at: today,
-                weekDays: {
+                week_days: {
                     create: weekDays.map(weekDay => {
                         return {week_day: weekDay}
                     })
@@ -56,7 +56,7 @@ export async function appHabitsRoutes(app: FastifyInstance) {
                 created_at: {
                     lte: parsedDate
                 },
-                weekDays: {
+                week_days: {
                     some: {
                         week_day: weekDay
                     }

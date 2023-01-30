@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Users {
-  id                     String          @id @default(uuid())
+  id                     String              @id @default(uuid())
   name                   String
   email                  String
   password               String?
@@ -19,7 +19,8 @@ model Users {
   created_at             DateTime
   habits                 Habit[]
   days                   Day[]
-  ExternalUsers          ExternalUsers[]
+  external_users         ExternalUsers[]
+  users_notification     UsersNotification[]
 
   @@unique([email])
   @@map("users")
@@ -30,10 +31,23 @@ model ExternalUsers {
   social  String
   user_id String
 
-  Users Users @relation(fields: [user_id], references: [id])
+  users Users @relation(fields: [user_id], references: [id])
 
   @@id([id, social])
   @@map("external_users")
+}
+
+model UsersNotification {
+  id              String    @id @default(uuid())
+  endpoint        String
+  expiration_date DateTime?
+  p256dh          String
+  auth            String
+  user_id         String?
+
+  user Users? @relation(fields: [user_id], references: [id])
+
+  @@map("users_notification")
 }
 
 model Habit {
@@ -42,9 +56,9 @@ model Habit {
   created_at DateTime
   user_id    String
 
-  dayHabits DayHabit[]
-  weekDays  HabitWeekDays[]
-  Users     Users           @relation(fields: [user_id], references: [id])
+  day_habits DayHabit[]
+  week_days  HabitWeekDays[]
+  Users      Users           @relation(fields: [user_id], references: [id])
 
   @@map("habits")
 }
@@ -55,7 +69,7 @@ model Day {
   user_id String
 
   dayHabits DayHabit[]
-  Users     Users      @relation(fields: [user_id], references: [id])
+  user      Users      @relation(fields: [user_id], references: [id])
 
   @@unique([date, user_id])
   @@map("days")

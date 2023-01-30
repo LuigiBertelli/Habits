@@ -126,7 +126,7 @@ export async function appUsersRoutes(app: FastifyInstance) {
         await prisma.externalUsers.create({
             data: {
                 id,
-                Users: {
+                users: {
                     connect: {
                         id: user.id
                     }
