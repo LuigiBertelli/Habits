@@ -1,8 +1,9 @@
 import { prisma } from '../lib/prisma'
 import { FastifyInstance } from 'fastify'
 import PushManager from 'web-push'
-import { string, z } from 'zod'
+import { z } from 'zod'
 import dayjs from 'dayjs'
+import nodeCron from 'node-cron'
 
 const publicKey = 'BHolOnybF474DaQ-CXDbZuqpisesDX-5wGzoQP3duvtz5J6gPdHl78T2VkoRJ2QhPqtPJ3fBO-PQRVYHowU888s'
 const privateKey = '-BBw45ddR6af-M2FG5uDUJL1LrqnjZMmBL5NcVA4gMA'
@@ -53,6 +54,24 @@ export async function appNotificationsRoutes(app: FastifyInstance) {
         });
 
         return res.status(201).send({notification_id: notification.id})
+    })
+
+    app.patch('/notifications/vinculate-user',async (req) => {
+        const vinculateUserBody = z.object({
+            userId: z.string().uuid(),
+            notificationId: z.string().uuid()
+        })
+
+        const { userId, notificationId } = vinculateUserBody.parse(req.body)
+
+        await prisma.usersNotification.update({
+            where: {
+                id: notificationId
+            },
+            data: {
+                user_id: userId
+            }
+        })
     })
 
     app.post('/notifications/push', async(req) => {

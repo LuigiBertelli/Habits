@@ -11,16 +11,18 @@ datasource db {
 }
 
 model Users {
-  id                     String              @id @default(uuid())
+  id                     String    @id @default(uuid())
   name                   String
   email                  String
   password               String?
   recovery_password_hash String?
+  last_login             DateTime?
   created_at             DateTime
-  habits                 Habit[]
-  days                   Day[]
-  external_users         ExternalUsers[]
-  users_notification     UsersNotification[]
+
+  habits             Habit[]
+  days               Day[]
+  external_users     ExternalUsers[]
+  users_notification UsersNotification[]
 
   @@unique([email])
   @@map("users")
