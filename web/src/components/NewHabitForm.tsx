@@ -54,7 +54,7 @@ export const NewHabitForm = ({ userId } : NewHabitFormProps) => {
             <input 
                 type="text" 
                 id="title" 
-                className="p-4 rounded-lg mt-3 bg-zinc-800 text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-600 focus:ring-offset-2 focus:ring-offset-zinc-900"
+                className="rounded-lg mt-3 text-base leading-tight py-2 bg-zinc-800 text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-600 focus:ring-offset-2 focus:ring-offset-zinc-900"
                 placeholder="i.e: Exercises, Sleep well, etc..." 
                 autoFocus
                 value={title}
