@@ -4,24 +4,30 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { PasswordInput } from '../components/PasswordInput'
 import { api } from '../lib/axios'
 
+interface inputFormProps {
+    errors: string[],
+    success: boolean,
+    value: string
+}
+
 export const RecoveryPassword = () => {
     const params = useParams();
     const navigate = useNavigate();
 
     const { userId, hash } = params;
 
-    const [password, setPassword] = useState('');
-    const [secPassword, setSecPassword] = useState('');
+    const [passwordInput, setPasswordInput] = useState<inputFormProps>({value: '', errors: [], success: false});
+    const [secPasswordInput, setSecPasswordInput] = useState<inputFormProps>({value: '', errors: [], success: false});
 
     const handleSubmitRecovery = async(e: FormEvent) => {
         e.preventDefault();
 
         try {
-            if(password && secPassword) {
+            if(passwordInput.errors?.length === 0 && secPasswordInput.errors?.length === 0) {
                 const res = await api.patch('recovery-password', {
                     userId,
                     hash,
-                    newPassword: password
+                    newPassword: passwordInput
                 })
                 
                 const {error} = res.data;
@@ -30,8 +36,8 @@ export const RecoveryPassword = () => {
                     alert(error);
                 }
                 else {
-                    setPassword('');
-                    setSecPassword('');
+                    setPasswordInput({value: '', errors: [], success: true});
+                    setSecPasswordInput({value: '', errors: [], success: true});
                     navigate('/login');
                 }
             } else 
@@ -47,11 +53,13 @@ export const RecoveryPassword = () => {
         <div>
             <form onSubmit={handleSubmitRecovery}>
                 <PasswordInput
-                    password={password}
-                    setPassword={setPassword}/>
+                    password={passwordInput}
+                    info={true}
+                    setPassword={(val) => setPasswordInput(prevState => ({value: val.value ?? prevState.value, errors: val.errors ?? prevState.errors, success: val.success ?? prevState.success}))}/>
                 <PasswordInput 
-                    password={secPassword}
-                    setPassword={setSecPassword}/>
+                    info={false}
+                    password={secPasswordInput}
+                    setPassword={(val) => setSecPasswordInput(prevState => ({value: val.value ?? prevState.value, errors: val.errors ?? prevState.errors, success: val.success ?? prevState.success}))}/>
 
                 <button 
                     type="submit">

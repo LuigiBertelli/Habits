@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { initializeApp } from "firebase/app";
+import { initializeApp } from 'firebase/app'
+import { getAuth, User } from 'firebase/auth'
 
 import { api } from '../lib/axios'
 import { setCookie } from '../utils/cookies'
@@ -12,24 +13,32 @@ import { FacebookLoginButton} from './FacebookLoginButton'
 import logoImg from '../assets/logo.svg'
 
 import authJson from '../configs/firebaseAuth.json'
-import { getAuth, User } from 'firebase/auth'
+
 import { PasswordInput } from './PasswordInput';
+import { TextInput } from './TextInput'
+
+interface inputFormProps {
+    errors: string[],
+    success: boolean,
+    value: string
+}
 
 const firebaseConfig = authJson.auth;
+
 
 export const LoginForm = () => {
   // Initialize Firebase
   const firebaseApp = initializeApp(firebaseConfig);
   const firebaseAuth = getAuth(firebaseApp);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [emailInput, setEmailInput] = useState<inputFormProps>({value: '', errors: [], success: true});
+  const [passwordInput, setPasswordInput] = useState<inputFormProps>({value: '', errors: [], success: true});
   const navigate = useNavigate();
 
   const logIn = (userId: string) => {
     setCookie('userId', userId, 3);
-    setEmail('');
-    setPassword('');
+    setEmailInput({value: '', errors:[], success: false});
+    setPasswordInput({value: '', errors:[], success: false});
     navigate('/');
   }
 
@@ -63,8 +72,8 @@ export const LoginForm = () => {
     try {
         const res = await api.get('login', {
             params: {
-                email,
-                password
+                email: emailInput.value,
+                password: passwordInput.value
             }
         });
 
@@ -95,16 +104,17 @@ export const LoginForm = () => {
                 alt="Habits Logo" />
         </Link>
 
-        <input 
-            className="mb-6 w-full text-zinc-800 p-2"
-            type="text" 
+        <TextInput
             placeholder="Email"
-            onChange={e => setEmail(e.target.value)}
-            value={email} />
+            props={emailInput}
+            setValue={(val) => setEmailInput(prevState => ({value: val.value ?? prevState.value, errors: val.errors ?? prevState.errors, success: val.success ?? prevState.success}))}
+             />
 
         <PasswordInput 
-            password={password}
-            setPassword={setPassword}/>
+            info={false}
+            styles={{container: 'mb-8'}}
+            password={passwordInput}
+            setPassword={(val) => setPasswordInput(prevState => ({value: val.value ?? prevState.value, errors: val.errors ?? prevState.errors, success: val.success ?? prevState.success}))}/>
 
         <button 
             type="submit" 
