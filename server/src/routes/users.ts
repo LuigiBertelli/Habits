@@ -39,9 +39,21 @@ export async function appUsersRoutes(app: FastifyInstance) {
             name: z.string().trim()
         })
         
-        const user = await createUser(signupParams.parse(req.body))
+        try {
+            const body = signupParams.parse(req.body)
+            let user = await prisma.users.findUnique({where: {email: body.email}})
+            if(user !== null)
+                return res.status(200).send({errors: {email: 'Email already registered!'}})
 
-        return res.status(201).send({userId: user.id})
+            user = await createUser(body)
+            
+            return res.status(201).send({userId: user.id})
+        } catch(err) {
+            return res.status(200).send({errors: {general: 'Error in your register, try again later!'}})
+        }
+        
+
+        
     })
 
     app.get('/login', async(req) => {

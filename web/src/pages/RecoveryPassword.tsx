@@ -53,14 +53,10 @@ export const RecoveryPassword = () => {
         <div>
             <form onSubmit={handleSubmitRecovery}>
                 <PasswordInput
+                    register={true}
                     password={passwordInput}
-                    info={true}
                     setPassword={(val) => setPasswordInput(prevState => ({value: val.value ?? prevState.value, errors: val.errors ?? prevState.errors, success: val.success ?? prevState.success}))}/>
-                <PasswordInput 
-                    info={false}
-                    password={secPasswordInput}
-                    setPassword={(val) => setSecPasswordInput(prevState => ({value: val.value ?? prevState.value, errors: val.errors ?? prevState.errors, success: val.success ?? prevState.success}))}/>
-
+                
                 <button 
                     type="submit">
                     Continue

@@ -19,7 +19,7 @@ interface TextInputProps{
 
 export const TextInput = ({props, validation, setValue, placeholder, styles} : TextInputProps) => {
   return (
-    <div className="w-full my-3">
+    <div className="w-full my-4">
         <input
             className={clsx(`w-full p-4 bg-zinc-800 text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-600 focus:ring-offset-2 focus:ring-offset-zinc-900  ${styles ?? ''}`, {
               'ring-2 ring-red-600 ring-offset-2 ring-offset-zinc-900': props.errors.length > 0,

@@ -16,7 +16,7 @@ interface PasswordValidatorProps {
         success: boolean
     },
     setPassword: (val: InputPasswordProps) => void,
-    secPassword?: string
+    secPassword: string
 }
 
 export const PasswordValidator = ({password, setPassword, secPassword} : PasswordValidatorProps) => {
@@ -36,35 +36,20 @@ export const PasswordValidator = ({password, setPassword, secPassword} : Passwor
                     'hidden': !focus,
                 })}>
                 <div className="min-w-[320px] p-6 rounded-2xl bg-zinc-900 flex flex-col focus:outline-none focus:ring-2 focus:ring-violet-600 focus:ring-offset-2 focus:ring-offset-background">
-                    {
-                        secPassword ? 
-                            <ReactPasswordChecklist
-                                rules={["minLength","specialChar","number","capital","match"]}
-                                minLength={5}
-                                value={password.value}
-                                valueAgain={secPassword}
-                                onChange={(isValid) => {
-                                    if(isValid) {
-                                        setPassword({...password, success: true, errors: []});
-                                    } else {
-                                        setPassword({...password, success: false, errors: ['']});
-                                    }
-                                }}
-                            />
-                        :
-                            <ReactPasswordChecklist
-                                rules={["minLength","specialChar","number","capital","match"]}
-                                minLength={5}
-                                value={password.value}
-                                onChange={(isValid) => {
-                                    if(isValid) {
-                                        setPassword({...password, success: true, errors: []});
-                                    } else {
-                                        setPassword({...password, success: false, errors: ['']});
-                                    }
-                                }}
-                            />
-                    }
+                    <ReactPasswordChecklist
+                        rules={["minLength","specialChar","number","capital", "match"]}
+                        minLength={5}
+                        value={password.value}
+                        valueAgain={secPassword}
+                        onChange={(isValid) => {
+                            if(isValid)
+                                setPassword({success: true, errors: []});
+                            else
+                                setPassword({success: false, errors: ['']});
+                            
+                        }}
+                    />
+                    
                 </div>
             </div>
         </div>

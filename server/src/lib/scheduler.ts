@@ -36,7 +36,6 @@ export function scheduleDiaryNotifications() {
                 }
             }, 'Habits')
         })
-        
     } )
 
     task.start()

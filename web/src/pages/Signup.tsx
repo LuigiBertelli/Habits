@@ -5,7 +5,7 @@ import { FormEvent, useEffect, useState } from 'react'
 import PasswordChecklist from "react-password-checklist"
 
 import { api } from '../lib/axios'
-import { setCookie } from '../utils/cookies'
+import { getCookie, setCookie } from '../utils/cookies'
 
 import authJson from '../configs/firebaseAuth.json'
 
@@ -32,7 +32,6 @@ export const Signup = () => {
     const [userName, setUserName] = useState<inputFormProps>({value: '', errors: [], success: false});
     const [email, setEmail] = useState<inputFormProps>({value: '', errors: [], success: false});
     const [password, setPassword] = useState<inputFormProps>({value: '', errors: [], success: false});
-    const [secPassword, setSecPassword] = useState<inputFormProps>({value: '', errors: [], success: false});
     const navigate = useNavigate();
 
     const logIn = (userId: string) => {
@@ -40,7 +39,6 @@ export const Signup = () => {
         setUserName({value: '', success: true, errors: []});
         setEmail({value: '', success: true, errors: []});
         setPassword({value: '', success: true, errors: []});
-        setSecPassword({value: '', success: true, errors: []});
         navigate('/');
     }
 
@@ -70,11 +68,54 @@ export const Signup = () => {
 
     const handleSubmit = async(e: FormEvent) => {
         e.preventDefault();
-    }
 
-    useEffect(() => {
-        setSecPassword({...secPassword, success: password.success, errors: password.errors});
-    }, [password.errors, password.success])
+        try {
+            if(userName.success && email.success && password.success){
+                const result = await api.post('signup', {
+                    name: userName.value,
+                    email: email.value,
+                    password: password.value
+                });
+
+                if('errors' in result.data) {
+                    if(typeof result.data.errors === 'object'){
+                        for(const [key, value] of Object.entries(result.data.errors)){
+                            if(typeof value === 'string'){
+                                switch(key) {
+                                    case 'email': 
+                                        setEmail(prevState => ({...prevState, success: false, errors: [value, ...prevState.errors]}));
+                                        break;
+                                    case 'name':
+                                        setEmail(prevState => ({...prevState, success: false, errors: [value, ...prevState.errors]}));
+                                        break;
+                                    case 'password':
+                                        setEmail(prevState => ({...prevState, success: false, errors: [value, ...prevState.errors]}));
+                                        break;
+                                }
+                            }
+                            alert(value);
+                        }
+                    }
+                }
+                
+                if('userId' in result.data){
+                    const notificationId = getCookie('notifications_id');
+                    const userId : string = result.data.userId;
+                    if(notificationId !== ''){
+                        await api.patch('notifications/vinculate-user', {
+                            notificationId,
+                            userId
+                        });
+                    }
+
+                    logIn(userId);
+                }
+            }
+        } catch(err) {
+            console.log(err);
+        }
+        
+    }
 
     return (
       <div className="w-full max-w-5xl px-6 flex items-center justify-center">
@@ -119,7 +160,6 @@ export const Signup = () => {
                             if(email.value.trim() === '')
                                 errors.push('email is required');
                             
-                            console.log(email.value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i));
                             if(!email.value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i))
                                 errors.push('invalid email');
 
@@ -129,20 +169,17 @@ export const Signup = () => {
                         placeholder="Email" />
 
                     <PasswordInput 
-                        info={true}
+                        styles={{
+                            container: 'mb-9'
+                        }}
+                        register={true}
                         password={password}
                         setPassword={(val) => setPassword(prevState => ({value: val.value ?? prevState.value, errors: val.errors ?? prevState.errors, success: val.success ?? prevState.success}))}/>
-
-                    <PasswordInput 
-                        info={false}
-                        password={secPassword}
-                        placeholder="Repeat Password"
-                        setPassword={(val) => setSecPassword(prevState => ({value: val.value ?? prevState.value, errors: val.errors ?? prevState.errors, success: val.success ?? prevState.success}))}/>
 
                     <button 
                         type="submit" 
                         className="w-full mb-6 h-12 bg-green-500 rounded-md items-center px-2 font-semibold text-white text-center text-base leading-tight">
-                        SignUp
+                        Sign Up
                     </button>
                 </form>
 
